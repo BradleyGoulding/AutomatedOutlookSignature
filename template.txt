@@ -1,0 +1,14 @@
+$(if($user.DisplayName){ $user.DisplayName })
+$(if($user.JobTitle){ $user.JobTitle })
+___________________________________________________________
+
+$(if($user.Company){ $($user.Company) })
+$(if($user.StreetAddress){ "$($user.StreetAddress), " })
+$(if($user.City){ "$($user.City), " })
+$(if($user.State){ "$($user.State), " })
+$(if($user.PostalCode){ $user.PostalCode })
+
+$(if($($user.TelephoneNumber)){"T: $($user.TelephoneNumber)"})
+$(if($($user.Mobile)){"M: $($user.Mobile)"})
+$(if($user.EmailAddress){"E: $($user.EmailAddress)"})
+$(if($($user.WebPage)){"W: $($user.WebPage)"})

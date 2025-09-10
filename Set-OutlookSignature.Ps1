@@ -199,30 +199,25 @@ function Get-SignatureHTML {
         [UserAccount]$user
     )
 
-    Write-Verbose "Building HTML"
+    Write-Verbose "Building HTML from template"
 
-    return @"
-$(if($user.DisplayName){"<span><b>$($user.DisplayName)</b></span><br />"})
-$(if($user.JobTitle){"<span>$($user.JobTitle)</span><br /><br />"})
-
-<p>$(if($logo){"<img src='$logo' />"})</p>
-
-<p>
-$(if($user.Company){ "<b>$($user.Company)</b><br />" })
-$(if($user.StreetAddress){ "$($user.StreetAddress), " })
-$(if($user.City){ "$($user.City), " })
-$(if($user.State){ "$($user.State), " })
-$(if($user.PostalCode){ $user.PostalCode })
-</p>
-
-<table>
-    $(if($($user.TelephoneNumber)){"<tr><td><b>T:</b></td><td><a href='tel:$($user.TelephoneNumber)'>$($user.TelephoneNumber)</a></td></tr>"})
-    $(if($($user.Mobile)){"<tr><td><b>M:</b></td><td><a href='tel:$($user.Mobile)'>$($user.Mobile)</a></td></tr>"})
-    $(if($user.EmailAddress){"<tr><td><b>E:</b></td><td><a href='mailto:$($user.EmailAddress)'>$($user.EmailAddress)</a></td></tr>"})
-    $(if($($user.WebPage)){"<tr><td><b>W:</b></td><td><a href='https://$($user.WebPage)'>$($user.WebPage)</a></td></tr>"})
-</table>
-<br />
-"@
+    try {
+        $templatePath = Join-Path -Path $PSScriptRoot -ChildPath "template.html"
+        if (-not (Test-Path -Path $templatePath)) {
+            Write-Error "HTML template file not found at: $templatePath"
+            exit 1
+        }
+        
+        $template = Get-Content -Path $templatePath -Raw
+        
+        # Use Invoke-Expression to evaluate the template with variables
+        $expandedTemplate = $ExecutionContext.InvokeCommand.ExpandString($template)
+        
+        return $expandedTemplate
+    } catch {
+        Write-Error "Error reading or processing HTML template: $($_.Exception.Message)"
+        exit 1
+    }
 }
 
 function Get-SignaturePlainText {
@@ -231,24 +226,25 @@ function Get-SignaturePlainText {
         [UserAccount]$user
     )
 
-    Write-Verbose "Building Plaint Text"
+    Write-Verbose "Building Plain Text from template"
 
-    return @"
-$(if($user.DisplayName){ $user.DisplayName })
-$(if($user.JobTitle){ $user.JobTitle })
-___________________________________________________________
-
-$(if($user.Company){ $($user.Company) })
-$(if($user.StreetAddress){ "$($user.StreetAddress), " })
-$(if($user.City){ "$($user.City), " })
-$(if($user.State){ "$($user.State), " })
-$(if($user.PostalCode){ $user.PostalCode })
-
-$(if($($user.TelephoneNumber)){"T: $($user.TelephoneNumber)"})
-$(if($($user.Mobile)){"M: $($user.Mobile)"})
-$(if($user.EmailAddress){"E: $($user.EmailAddress)"})
-$(if($($user.WebPage)){"W: $($user.WebPage)"})
-"@
+    try {
+        $templatePath = Join-Path -Path $PSScriptRoot -ChildPath "template.txt"
+        if (-not (Test-Path -Path $templatePath)) {
+            Write-Error "Plain text template file not found at: $templatePath"
+            exit 1
+        }
+        
+        $template = Get-Content -Path $templatePath -Raw
+        
+        # Use Invoke-Expression to evaluate the template with variables
+        $expandedTemplate = $ExecutionContext.InvokeCommand.ExpandString($template)
+        
+        return $expandedTemplate
+    } catch {
+        Write-Error "Error reading or processing plain text template: $($_.Exception.Message)"
+        exit 1
+    }
 }
 
 # [ CSS ]
